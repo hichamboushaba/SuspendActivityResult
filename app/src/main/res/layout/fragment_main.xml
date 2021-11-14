@@ -10,4 +10,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Permission (Regular way)" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/permission_2_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Permission (Coroutines)" />
 </LinearLayout>
