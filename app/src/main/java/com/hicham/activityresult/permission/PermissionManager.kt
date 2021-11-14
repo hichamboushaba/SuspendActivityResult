@@ -6,6 +6,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.hicham.activityresult.ActivityProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
@@ -29,31 +31,37 @@ class PermissionManager @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun requestPermissions(vararg permissions: String): Map<String, PermissionStatus> {
-        val currentActivity = activityProvider.currentActivity ?: return permissions.associateWith {
-            PermissionDenied(false)
-        }
-
-        return suspendCancellableCoroutine { continuation ->
-            val launcher = currentActivity.activityResultRegistry.register(
-                "permission_${keyIncrement.getAndIncrement()}",
-                ActivityResultContracts.RequestMultiplePermissions()
-            ) { result ->
-                continuation.resume(permissions.associateWith {
-                    if (result[it] == true) {
-                        PermissionGranted
-                    } else {
-                        val shouldShowRationale =
-                            currentActivity.shouldShowRequestPermissionRationale(it)
-                        PermissionDenied(shouldShowRationale)
+        val key = "permission_${keyIncrement.getAndIncrement()}"
+        var isLaunched = false
+        return activityProvider.activityFlow
+            .mapLatest { currentActivity ->
+                suspendCancellableCoroutine<Map<String, PermissionStatus>> { continuation ->
+                    val launcher = currentActivity.activityResultRegistry.register(
+                        key,
+                        ActivityResultContracts.RequestMultiplePermissions()
+                    ) { result ->
+                        continuation.resume(permissions.associateWith {
+                            if (result[it] == true) {
+                                PermissionGranted
+                            } else {
+                                val shouldShowRationale =
+                                    currentActivity.shouldShowRequestPermissionRationale(it)
+                                PermissionDenied(shouldShowRationale)
+                            }
+                        })
                     }
-                })
-            }
-            launcher.launch(permissions)
 
-            continuation.invokeOnCancellation {
-                launcher.unregister()
+                    if (!isLaunched) {
+                        launcher.launch(permissions)
+                        isLaunched = true
+                    }
+
+                    continuation.invokeOnCancellation {
+                        launcher.unregister()
+                    }
+                }
             }
-        }
+            .first()
     }
 }
 
