@@ -2,7 +2,9 @@ package com.hicham.activityresult.permission
 
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
+import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.os.bundleOf
 import com.hicham.activityresult.ActivityProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,7 +21,13 @@ class PermissionManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val activityProvider: ActivityProvider
 ) {
+    companion object {
+        private const val SAVED_STATE_REGISTRY_KEY = "permissions_saved_state"
+    }
+
     private val keyIncrement = AtomicInteger(0)
+
+    private var pendingPermission: String? = null
 
     fun hasPermission(permission: String): Boolean {
         return context.checkSelfPermission(permission) == PERMISSION_GRANTED
@@ -31,15 +39,34 @@ class PermissionManager @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun requestPermissions(vararg permissions: String): Map<String, PermissionStatus> {
-        val key = "permission_${keyIncrement.getAndIncrement()}"
         var isLaunched = false
+        val key = activityProvider.currentActivity?.let { activity ->
+            val savedBundle =
+                activity.savedStateRegistry.consumeRestoredStateForKey(SAVED_STATE_REGISTRY_KEY)
+            if (savedBundle?.getString("pending_permission") == permissions.joinToString(",")) {
+                isLaunched = true
+                generateKey(savedBundle.getInt("key_increment"))
+            } else {
+                generateKey(keyIncrement.getAndIncrement())
+            }
+        } ?: return permissions.associateWith {
+            if (hasPermission(it)) PermissionGranted else PermissionDenied(shouldShowRationale = false)
+        }
+
+        pendingPermission = permissions.joinToString(",")
         return activityProvider.activityFlow
             .mapLatest { currentActivity ->
+                if (!isLaunched) {
+                    prepareSavedData(currentActivity)
+                }
+
                 suspendCancellableCoroutine<Map<String, PermissionStatus>> { continuation ->
                     val launcher = currentActivity.activityResultRegistry.register(
                         key,
                         ActivityResultContracts.RequestMultiplePermissions()
                     ) { result ->
+                        pendingPermission = null
+                        clearSavedStateData(currentActivity)
                         continuation.resume(permissions.associateWith {
                             if (result[it] == true) {
                                 PermissionGranted
@@ -63,6 +90,29 @@ class PermissionManager @Inject constructor(
             }
             .first()
     }
+
+    private fun prepareSavedData(currentActivity: ComponentActivity) {
+        currentActivity.savedStateRegistry.registerSavedStateProvider(
+            SAVED_STATE_REGISTRY_KEY
+        ) {
+            bundleOf(
+                "pending_permission" to pendingPermission,
+                "key_increment" to keyIncrement.get() - 1
+            )
+        }
+    }
+
+    private fun clearSavedStateData(currentActivity: ComponentActivity) {
+        currentActivity.savedStateRegistry.unregisterSavedStateProvider(
+            SAVED_STATE_REGISTRY_KEY
+        )
+        // Delete the data by consuming it
+        currentActivity.savedStateRegistry.consumeRestoredStateForKey(
+            SAVED_STATE_REGISTRY_KEY
+        )
+    }
+
+    private fun generateKey(increment: Int) = "permission_$increment"
 }
 
 sealed class PermissionStatus
