@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.hicham.activityresult.BaseFragment
 import com.hicham.activityresult.R
 import com.hicham.activityresult.databinding.FragmentPermissionBinding
@@ -28,7 +26,6 @@ class PermissionSuspendFragment :
         }
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            observeEvents(binding)
             observeViewState(binding)
         }
     }
@@ -46,31 +43,6 @@ class PermissionSuspendFragment :
                     }
                 } else {
                     binding.currentLocation.text = ""
-                }
-            }
-            .launchIn(this)
-    }
-
-    private fun CoroutineScope.observeEvents(binding: FragmentPermissionBinding) {
-        viewModel.events
-            .onEach {
-                when (it) {
-                    PermissionSuspendViewModel.Event.ShowPermissionRationale -> {
-                        MaterialAlertDialogBuilder(requireActivity())
-                            .setTitle("The app needs the location permission")
-                            .setPositiveButton("Grant") { _, _ ->
-                                viewModel.toggleState()
-                            }
-                            .setCancelable(false)
-                            .show()
-                    }
-                    PermissionSuspendViewModel.Event.ShowPermissionSnackBar -> {
-                        Snackbar.make(
-                            binding.root,
-                            "Location permission was denied",
-                            Snackbar.LENGTH_LONG
-                        ).show()
-                    }
                 }
             }
             .launchIn(this)
