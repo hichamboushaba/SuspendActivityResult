@@ -3,6 +3,7 @@ package com.hicham.activityresult.permission
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import com.hicham.activityresult.ActivityProvider
@@ -60,32 +61,32 @@ class PermissionManager @Inject constructor(
                     prepareSavedData(currentActivity)
                 }
 
-                suspendCancellableCoroutine<Map<String, PermissionStatus>> { continuation ->
-                    val launcher = currentActivity.activityResultRegistry.register(
-                        key,
-                        ActivityResultContracts.RequestMultiplePermissions()
-                    ) { result ->
-                        pendingPermission = null
-                        clearSavedStateData(currentActivity)
-                        continuation.resume(permissions.associateWith {
-                            if (result[it] == true) {
-                                PermissionGranted
-                            } else {
-                                val shouldShowRationale =
-                                    currentActivity.shouldShowRequestPermissionRationale(it)
-                                PermissionDenied(shouldShowRationale)
-                            }
-                        })
-                    }
+                var launcher: ActivityResultLauncher<Array<out String>>? = null
+                try {
+                    suspendCancellableCoroutine<Map<String, PermissionStatus>> { continuation ->
+                        launcher = currentActivity.activityResultRegistry.register(
+                            key,
+                            ActivityResultContracts.RequestMultiplePermissions()
+                        ) { result ->
+                            pendingPermission = null
+                            clearSavedStateData(currentActivity)
+                            continuation.resume(permissions.associateWith {
+                                if (result[it] == true) {
+                                    PermissionGranted
+                                } else {
+                                    val shouldShowRationale = currentActivity.shouldShowRequestPermissionRationale(it)
+                                    PermissionDenied(shouldShowRationale)
+                                }
+                            })
+                        }
 
-                    if (!isLaunched) {
-                        launcher.launch(permissions)
-                        isLaunched = true
+                        if (!isLaunched) {
+                            launcher!!.launch(permissions)
+                            isLaunched = true
+                        }
                     }
-
-                    continuation.invokeOnCancellation {
-                        launcher.unregister()
-                    }
+                } finally {
+                    launcher?.unregister()
                 }
             }
             .first()

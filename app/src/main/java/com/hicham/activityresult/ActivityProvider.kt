@@ -14,7 +14,7 @@ class ActivityProvider @Inject constructor() :
     Application.ActivityLifecycleCallbacks {
     private val _activityFlow = MutableStateFlow(WeakReference<ComponentActivity>(null))
     val activityFlow = _activityFlow.asStateFlow()
-        .distinctUntilChanged { old, new -> old.get() == new.get() }
+        .distinctUntilChanged { old, new -> old.get() === new.get() }
         .filter { it.get() != null }
         .map { it.get()!! }
 

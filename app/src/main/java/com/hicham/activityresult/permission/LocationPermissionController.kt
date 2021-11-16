@@ -45,7 +45,6 @@ class LocationPermissionController @Inject constructor(
                         .setNegativeButton("Cancel", null)
                         .setOnDismissListener {
                             if (continuation.isActive) {
-                                println("resume dismiss")
                                 continuation.resume(false)
                             }
                         }
