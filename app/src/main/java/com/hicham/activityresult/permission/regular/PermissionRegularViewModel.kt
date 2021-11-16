@@ -25,24 +25,24 @@ class PermissionRegularViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
         .whenAtLeast(Lifecycle.State.STARTED)
 
-    private val _locationPermissionGranted = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
-    private val _isStarted = MutableStateFlow(false)
+    private val locationPermissionGranted = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
+    private val isStarted = MutableStateFlow(false)
 
     @SuppressLint("MissingPermission")
-    val viewState = _isStarted
+    val viewState = isStarted
         .onEach { savedStateHandle.set(IS_STARTED_KEY, it) }
         .flatMapLatest { started ->
             if (!started) {
                 flowOf(ViewState(isObservingLocation = false, currentLocation = null))
             } else {
                 _events.trySend(Event.RequestLocationPermission)
-                _locationPermissionGranted.flatMapLatest { granted ->
+                locationPermissionGranted.flatMapLatest { granted ->
                     if (granted) {
                         startObservingLocation()
                             .map { ViewState(isObservingLocation = true, currentLocation = it) }
                             .onStart { emit(ViewState(isObservingLocation = true)) }
                     } else {
-                        _isStarted.value = false
+                        isStarted.value = false
                         flowOf(ViewState(isObservingLocation = false, currentLocation = null))
                     }
                 }
@@ -61,7 +61,7 @@ class PermissionRegularViewModel @Inject constructor(
     }
 
     init {
-        _isStarted.value = savedStateHandle.get<Boolean>(IS_STARTED_KEY) ?: false
+        isStarted.value = savedStateHandle.get<Boolean>(IS_STARTED_KEY) ?: false
     }
 
     fun onPermissionGranted(granted: Boolean, shouldShowRationale: Boolean) {
@@ -73,12 +73,12 @@ class PermissionRegularViewModel @Inject constructor(
             }
         }
         if (granted || !shouldShowRationale) {
-            _locationPermissionGranted.tryEmit(granted)
+            locationPermissionGranted.tryEmit(granted)
         }
     }
 
     fun toggleState() {
-        _isStarted.update { !it }
+        isStarted.update { !it }
     }
 
     data class ViewState(
