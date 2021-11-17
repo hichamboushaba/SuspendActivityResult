@@ -24,6 +24,8 @@ class PermissionManager @Inject constructor(
 ) {
     companion object {
         private const val SAVED_STATE_REGISTRY_KEY = "permissions_saved_state"
+        private const val PENDING_PERMISSIONS_KEY = "pending_permission"
+        private const val LAST_INCREMENT_KEY = "key_increment"
     }
 
     private val keyIncrement = AtomicInteger(0)
@@ -44,9 +46,9 @@ class PermissionManager @Inject constructor(
         val key = activityProvider.currentActivity?.let { activity ->
             val savedBundle =
                 activity.savedStateRegistry.consumeRestoredStateForKey(SAVED_STATE_REGISTRY_KEY)
-            if (savedBundle?.getString("pending_permission") == permissions.joinToString(",")) {
+            if (savedBundle?.getString(PENDING_PERMISSIONS_KEY) == permissions.joinToString(",")) {
                 isLaunched = true
-                generateKey(savedBundle.getInt("key_increment"))
+                generateKey(savedBundle.getInt(LAST_INCREMENT_KEY))
             } else {
                 generateKey(keyIncrement.getAndIncrement())
             }
@@ -97,8 +99,8 @@ class PermissionManager @Inject constructor(
             SAVED_STATE_REGISTRY_KEY
         ) {
             bundleOf(
-                "pending_permission" to pendingPermission,
-                "key_increment" to keyIncrement.get() - 1
+                PENDING_PERMISSIONS_KEY to pendingPermission,
+                LAST_INCREMENT_KEY to keyIncrement.get() - 1
             )
         }
     }
