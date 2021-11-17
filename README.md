@@ -1,2 +1,2 @@
-Full code of the solution explained on the article: [Making callback Flows lifecycle aware
-](https://dev.to/hichamboushaba/making-callback-flows-lifecycle-aware-2dai)
+Full code of the solution explained on the article: [Consuming Activity Results using coroutines
+](https://dev.to/hichamboushaba/consuming-activity-results-using-coroutines-part-1-2j57)
