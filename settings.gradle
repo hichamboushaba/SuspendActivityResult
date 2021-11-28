@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "SuspendActivityResult"
 include ':app'
 include ':library'
+include ':startup'
