@@ -1,11 +1,9 @@
 package com.hicham.activityresult
 
-import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.os.bundleOf
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
@@ -17,17 +15,16 @@ import kotlin.coroutines.resume
 
 @Singleton
 class ActivityResultManager@Inject constructor(
-    @ApplicationContext private val context: Context,
     private val activityProvider: ActivityProvider
 ) {
     companion object {
         private const val SAVED_STATE_REGISTRY_KEY = "permissions_saved_state"
-        private const val PENDING_INPUT_KEY = "pending_input"
+        private const val PENDING_RESULT_KEY = "pending"
         private const val LAST_INCREMENT_KEY = "key_increment"
     }
 
     private val keyIncrement = AtomicInteger(0)
-    private var pendingInput: String? = null
+    private var pendingResult: Boolean = false
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun <I, O, C: ActivityResultContract<I, O>> requestResult(contract: C, input: I): O? {
@@ -35,8 +32,7 @@ class ActivityResultManager@Inject constructor(
         val key = activityProvider.currentActivity?.let { activity ->
             val savedBundle =
                 activity.savedStateRegistry.consumeRestoredStateForKey(SAVED_STATE_REGISTRY_KEY)
-            // We assume that the `toString()` is enough for comparing the input
-            if (savedBundle?.getString(PENDING_INPUT_KEY) == input.toString()) {
+            if (savedBundle?.getBoolean(PENDING_RESULT_KEY) == true) {
                 isLaunched = true
                 generateKey(savedBundle.getInt(LAST_INCREMENT_KEY))
             } else {
@@ -44,7 +40,7 @@ class ActivityResultManager@Inject constructor(
             }
         } ?: return null
 
-        pendingInput = input.toString()
+        pendingResult = true
         return activityProvider.activityFlow
             .mapLatest { currentActivity ->
                 if (!isLaunched) {
@@ -58,7 +54,7 @@ class ActivityResultManager@Inject constructor(
                             key,
                             contract
                         ) { result ->
-                            pendingInput = null
+                            pendingResult = false
                             clearSavedStateData(currentActivity)
                             continuation.resume(result)
                         }
@@ -80,7 +76,7 @@ class ActivityResultManager@Inject constructor(
             SAVED_STATE_REGISTRY_KEY
         ) {
             bundleOf(
-                PENDING_INPUT_KEY to pendingInput,
+                PENDING_RESULT_KEY to pendingResult,
                 LAST_INCREMENT_KEY to keyIncrement.get() - 1
             )
         }
