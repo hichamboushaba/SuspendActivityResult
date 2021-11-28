@@ -1,5 +1,6 @@
-package com.hicham.activityresult
+package dev.hichamboushaba.suspendactivityresult
 
+import android.app.Application
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
@@ -9,27 +10,20 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.atomic.AtomicInteger
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.coroutines.resume
 
-@Singleton
-class ActivityResultManager@Inject constructor(
-    private val activityProvider: ActivityProvider
-) {
-    companion object {
-        private const val SAVED_STATE_REGISTRY_KEY = "permissions_saved_state"
-        private const val PENDING_RESULT_KEY = "pending"
-        private const val LAST_INCREMENT_KEY = "key_increment"
-    }
+object ActivityResultManager {
+    private const val SAVED_STATE_REGISTRY_KEY = "permissions_saved_state"
+    private const val PENDING_RESULT_KEY = "pending"
+    private const val LAST_INCREMENT_KEY = "key_increment"
 
     private val keyIncrement = AtomicInteger(0)
     private var pendingResult: Boolean = false
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun <I, O, C: ActivityResultContract<I, O>> requestResult(contract: C, input: I): O? {
+    suspend fun <I, O, C : ActivityResultContract<I, O>> requestResult(contract: C, input: I): O? {
         var isLaunched = false
-        val key = activityProvider.currentActivity?.let { activity ->
+        val key = ActivityProvider.currentActivity?.let { activity ->
             val savedBundle =
                 activity.savedStateRegistry.consumeRestoredStateForKey(SAVED_STATE_REGISTRY_KEY)
             if (savedBundle?.getBoolean(PENDING_RESULT_KEY) == true) {
@@ -41,7 +35,7 @@ class ActivityResultManager@Inject constructor(
         } ?: return null
 
         pendingResult = true
-        return activityProvider.activityFlow
+        return ActivityProvider.activityFlow
             .mapLatest { currentActivity ->
                 if (!isLaunched) {
                     prepareSavedData(currentActivity)
@@ -93,4 +87,9 @@ class ActivityResultManager@Inject constructor(
     }
 
     private fun generateKey(increment: Int) = "permission_$increment"
+}
+
+@Suppress("unused")
+fun ActivityResultManager.init(application: Application) {
+    ActivityProvider.init(application)
 }
