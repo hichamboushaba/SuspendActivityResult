@@ -10,7 +10,8 @@ import javax.inject.Inject
 
 class PermissionManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val activityProvider: ActivityProvider
+    private val activityProvider: ActivityProvider,
+    private val activityResultManager: ActivityResultManager
 ) {
     fun hasPermission(permission: String): Boolean {
         return context.checkSelfPermission(permission) == PERMISSION_GRANTED
@@ -21,7 +22,7 @@ class PermissionManager @Inject constructor(
     }
 
     suspend fun requestPermissions(vararg permissions: String): Map<String, PermissionStatus> {
-        return ActivityResultManager.requestResult(
+        return activityResultManager.requestResult(
             ActivityResultContracts.RequestMultiplePermissions(),
             permissions
         )?.let { result ->

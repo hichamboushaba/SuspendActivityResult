@@ -3,7 +3,6 @@ package com.hicham.activityresult
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 import dev.hichamboushaba.suspendactivityresult.ActivityResultManager
-import dev.hichamboushaba.suspendactivityresult.init
 import javax.inject.Inject
 
 @HiltAndroidApp

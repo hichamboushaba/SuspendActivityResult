@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExternalFilesViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val activityResultManager: ActivityResultManager
 ) : BaseViewModel() {
     companion object {
         private const val IMAGE_URI_KEY = "image"
@@ -33,7 +34,7 @@ class ExternalFilesViewModel @Inject constructor(
     fun pickFile() {
         viewModelScope.launch {
             savedStateHandle.set(IS_WAITING_FOR_FILE_KEY, true)
-            val uri = ActivityResultManager.requestResult(
+            val uri = activityResultManager.requestResult(
                 ActivityResultContracts.OpenDocument(),
                 arrayOf("image/*")
             )
