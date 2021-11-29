@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.hicham.activityresult.ActivityProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.hichamboushaba.suspendactivityresult.ActivityResultManager
+import dev.hichamboushaba.suspendactivityresult.requestPermissions
 import javax.inject.Inject
 
 class PermissionManager @Inject constructor(
@@ -22,10 +23,7 @@ class PermissionManager @Inject constructor(
     }
 
     suspend fun requestPermissions(vararg permissions: String): Map<String, PermissionStatus> {
-        return activityResultManager.requestResult(
-            ActivityResultContracts.RequestMultiplePermissions(),
-            permissions
-        )?.let { result ->
+        return activityResultManager.requestPermissions(*permissions)?.let { result ->
             permissions.associateWith {
                 if (result[it] == true) {
                     PermissionGranted
