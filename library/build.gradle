@@ -1,7 +1,15 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
 }
+
+ext {
+    PUBLISH_ARTIFACT_ID = 'suspendactivityresult-no-startup'
+    PUBLISH_NAME = "SuspendActivityResult (manual startup)"
+}
+
+apply from: "${rootProject.projectDir}/gradle/maven-publish.gradle"
 
 android {
     compileSdk 31
