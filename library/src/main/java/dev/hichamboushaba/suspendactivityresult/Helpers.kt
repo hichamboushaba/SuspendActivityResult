@@ -10,49 +10,49 @@ import androidx.annotation.RequiresApi
  * see [RequestPermission]
  */
 suspend fun ActivityResultManager.requestPermission(permission: String): Boolean {
-    return requestResult(ActivityResultContracts.RequestPermission(), permission) ?: false
+    return requestResult(RequestPermission(), permission) ?: false
 }
 
 /**
  * see [RequestMultiplePermissions]
  */
 suspend fun ActivityResultManager.requestPermissions(vararg permission: String): Map<String, Boolean>? {
-    return requestResult(ActivityResultContracts.RequestMultiplePermissions(), permission)
+    return requestResult(RequestMultiplePermissions(), permission)
 }
 
 /**
  * see [TakePicturePreview]
  */
 suspend fun ActivityResultManager.takePicturePreview(): Bitmap? {
-    return requestResult(ActivityResultContracts.TakePicturePreview(), null)
+    return requestResult(TakePicturePreview(), null)
 }
 
 /**
  * see [TakePicture]
  */
 suspend fun ActivityResultManager.takePicture(destination: Uri): Boolean {
-    return requestResult(ActivityResultContracts.TakePicture(), destination) ?: false
+    return requestResult(TakePicture(), destination) ?: false
 }
 
 /**
  * see [TakeVideo]
  */
 suspend fun ActivityResultManager.takeVideo(destination: Uri): Bitmap? {
-    return requestResult(ActivityResultContracts.TakeVideo(), destination)
+    return requestResult(TakeVideo(), destination)
 }
 
 /**
  * see [PickContact]
  */
 suspend fun ActivityResultManager.pickContact(): Uri? {
-    return requestResult(ActivityResultContracts.PickContact(), null)
+    return requestResult(PickContact(), null)
 }
 
 /**
  * see [GetContent]
  */
 suspend fun ActivityResultManager.getContent(mimeType: String): Uri? {
-    return requestResult(ActivityResultContracts.GetContent(), mimeType)
+    return requestResult(GetContent(), mimeType)
 }
 
 /**
@@ -60,7 +60,7 @@ suspend fun ActivityResultManager.getContent(mimeType: String): Uri? {
  */
 @RequiresApi(18)
 suspend fun ActivityResultManager.getMultipleContents(mimeType: String): List<Uri> {
-    return requestResult(ActivityResultContracts.GetMultipleContents(), mimeType) ?: emptyList()
+    return requestResult(GetMultipleContents(), mimeType) ?: emptyList()
 }
 
 /**
@@ -68,7 +68,7 @@ suspend fun ActivityResultManager.getMultipleContents(mimeType: String): List<Ur
  */
 @RequiresApi(19)
 suspend fun ActivityResultManager.openDocument(mimeTypes: Array<String>): Uri? {
-    return requestResult(ActivityResultContracts.OpenDocument(), mimeTypes)
+    return requestResult(OpenDocument(), mimeTypes)
 }
 
 /**
@@ -76,12 +76,12 @@ suspend fun ActivityResultManager.openDocument(mimeTypes: Array<String>): Uri? {
  */
 @RequiresApi(19)
 suspend fun ActivityResultManager.openMultipleDocuments(mimeTypes: Array<String>): List<Uri> {
-    return requestResult(ActivityResultContracts.OpenMultipleDocuments(), mimeTypes) ?: emptyList()
+    return requestResult(OpenMultipleDocuments(), mimeTypes) ?: emptyList()
 }
 
 @RequiresApi(21)
 suspend fun ActivityResultManager.openDocumentTree(startingLocation: Uri? = null): Uri? {
-    return requestResult(ActivityResultContracts.OpenDocumentTree(), startingLocation)
+    return requestResult(OpenDocumentTree(), startingLocation)
 }
 
 /**
@@ -89,5 +89,5 @@ suspend fun ActivityResultManager.openDocumentTree(startingLocation: Uri? = null
  */
 @RequiresApi(19)
 suspend fun ActivityResultManager.createDocument(fileName: String): Uri? {
-    return requestResult(ActivityResultContracts.CreateDocument(), fileName)
+    return requestResult(CreateDocument(), fileName)
 }
