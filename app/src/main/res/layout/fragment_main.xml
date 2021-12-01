@@ -22,4 +22,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Read external files" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/internal_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Internal Result" />
+
 </LinearLayout>

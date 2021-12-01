@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.hicham.activityresult.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.hichamboushaba.suspendactivityresult.ActivityResultManager
-import dev.hichamboushaba.suspendactivityresult.openDocument
+import dev.hichamboushaba.suspendactivityresult.getContent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -34,7 +34,7 @@ class ExternalFilesViewModel @Inject constructor(
     fun pickFile() {
         viewModelScope.launch {
             savedStateHandle.set(IS_WAITING_FOR_FILE_KEY, true)
-            val uri = activityResultManager.openDocument(arrayOf("image/*"))
+            val uri = activityResultManager.getContent("image/*")
             savedStateHandle.set(IMAGE_URI_KEY, uri)
             savedStateHandle.set(IS_WAITING_FOR_FILE_KEY, false)
 
