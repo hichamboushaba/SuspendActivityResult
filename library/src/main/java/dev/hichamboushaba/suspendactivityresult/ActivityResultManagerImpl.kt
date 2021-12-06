@@ -88,5 +88,5 @@ internal object ActivityResultManagerImpl : ActivityResultManager {
         )
     }
 
-    private fun generateKey(increment: Int) = "permission_$increment"
+    private fun generateKey(increment: Int) = "result_$increment"
 }
