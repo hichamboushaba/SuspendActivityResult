@@ -1,3 +1,5 @@
+[![Version](https://img.shields.io/maven-central/v/dev.hichamboushaba.suspendactivityresult/suspendactivityresult)](https://repo1.maven.org/maven2/dev/hichamboushaba/suspendactivityresult/)
+
 ## SuspendActivityResult
 
 A lightweight library for requesting and
@@ -5,7 +7,7 @@ consuming [Activity Results](https://developer.android.com/reference/androidx/ac
 using coroutines, it's usage is as simple as:
 
 ```kotlin
-    val uri = ActivityResultManager.getInstance().requestResult(
+val uri = ActivityResultManager.getInstance().requestResult(
     contract = GetContent(),
     input = "image/*"
 )
@@ -21,13 +23,39 @@ For more information check the
 articles: [Part 1](https://dev.to/hichamboushaba/consuming-activity-results-using-coroutines-part-1-2j57)
 and [Part 2](TODO)
 
+### Runtime Permissions
+
+The library offers a utility class for requesting runtime permissions with access to
+the [shouldShowRequestPermissionRationale](https://developer.android.com/reference/android/app/Activity#shouldShowRequestPermissionRationale(java.lang.String))'s
+value:
+
+```kotlin
+val result = PermissionManager.getInstance()
+    .requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+when (result) {
+    PermissionGranted -> {
+        // TODO
+    }
+    is PermissionDenied -> {
+        if (result.shouldShowRationale) {
+            // TODO
+        } else {
+            // TODO
+        }
+    }
+}
+```
+
+This class uses internally `ActivityResultManager.getInstance().requestPermission()`, so everything
+below applies to it as well.
+
 ### Download
 
 ```groovy
 implementation 'dev.hichamboushaba.suspendactivityresult:suspendactivityresult:0.1.1'
 ```
 
-The default version uses [App Startup](https://developer.android.com/topic/libraries/app-startup)
+The default artifact uses [App Startup](https://developer.android.com/topic/libraries/app-startup)
 for the initialization.
 
 If you don't want this dependency added, you can use the other variant:
@@ -51,7 +79,7 @@ class App : Application() {
 
 `ActivityResultManager` is an interface, so for better testability, it's recommended to
 inject `ActivityResultManager.getInstance()`
-into your graph, for easier swapping to a fake or mocked implementation for tests.
+into your components, for easier swapping to a fake or mocked implementation for tests.
 
 ### Process-death
 
