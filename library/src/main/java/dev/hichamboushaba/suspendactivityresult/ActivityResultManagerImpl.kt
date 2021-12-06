@@ -17,30 +17,21 @@ internal object ActivityResultManagerImpl : ActivityResultManager {
     private const val LAST_INCREMENT_KEY = "key_increment"
 
     private val keyIncrement = AtomicInteger(0)
-    private var pendingResult: Boolean = false
+    private var pendingResult: String? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun <I, O, C : ActivityResultContract<I, O>> requestResult(
         contract: C,
         input: I
     ): O? {
-        var isLaunched = false
-        val key = ActivityProvider.currentActivity?.let { activity ->
-            val savedBundle =
-                activity.savedStateRegistry.consumeRestoredStateForKey(SAVED_STATE_REGISTRY_KEY)
-            if (savedBundle?.getBoolean(PENDING_RESULT_KEY) == true) {
-                isLaunched = true
-                generateKey(savedBundle.getInt(LAST_INCREMENT_KEY))
-            } else {
-                generateKey(keyIncrement.getAndIncrement())
-            }
-        } ?: return null
+        var (isLaunched, key) = ActivityProvider.currentActivity?.calculateKey(contract)
+            ?: return null
 
-        pendingResult = true
+        pendingResult = contract.javaClass.simpleName
         return ActivityProvider.activityFlow
             .mapLatest { currentActivity ->
                 if (!isLaunched) {
-                    prepareSavedData(currentActivity)
+                    currentActivity.prepareSavedData()
                 }
 
                 var launcher: ActivityResultLauncher<I>? = null
@@ -50,8 +41,8 @@ internal object ActivityResultManagerImpl : ActivityResultManager {
                             key,
                             contract
                         ) { result ->
-                            pendingResult = false
-                            clearSavedStateData(currentActivity)
+                            pendingResult = null
+                            currentActivity.clearSavedStateData()
                             continuation.resume(result)
                         }
 
@@ -67,8 +58,20 @@ internal object ActivityResultManagerImpl : ActivityResultManager {
             .first()
     }
 
-    private fun prepareSavedData(currentActivity: ComponentActivity) {
-        currentActivity.savedStateRegistry.registerSavedStateProvider(
+    private fun <C : ActivityResultContract<*, *>> ComponentActivity.calculateKey(contract: C): Pair<Boolean, String> {
+        fun generateKey(increment: Int) = "result_$increment"
+
+        val savedBundle = savedStateRegistry.consumeRestoredStateForKey(SAVED_STATE_REGISTRY_KEY)
+
+        return if (contract.javaClass.simpleName == savedBundle?.getString(PENDING_RESULT_KEY)) {
+            Pair(true, generateKey(savedBundle!!.getInt(LAST_INCREMENT_KEY)))
+        } else {
+            Pair(false, generateKey(keyIncrement.getAndIncrement()))
+        }
+    }
+
+    private fun ComponentActivity.prepareSavedData() {
+        savedStateRegistry.registerSavedStateProvider(
             SAVED_STATE_REGISTRY_KEY
         ) {
             bundleOf(
@@ -78,15 +81,13 @@ internal object ActivityResultManagerImpl : ActivityResultManager {
         }
     }
 
-    private fun clearSavedStateData(currentActivity: ComponentActivity) {
-        currentActivity.savedStateRegistry.unregisterSavedStateProvider(
+    private fun ComponentActivity.clearSavedStateData() {
+        savedStateRegistry.unregisterSavedStateProvider(
             SAVED_STATE_REGISTRY_KEY
         )
         // Delete the data by consuming it
-        currentActivity.savedStateRegistry.consumeRestoredStateForKey(
+        savedStateRegistry.consumeRestoredStateForKey(
             SAVED_STATE_REGISTRY_KEY
         )
     }
-
-    private fun generateKey(increment: Int) = "result_$increment"
 }
