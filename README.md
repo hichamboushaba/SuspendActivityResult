@@ -17,6 +17,10 @@ or using the built-in extensions:
 val uri = ActivityResultManager.getInstance().getContent("image/*")
 ```
 
+For more information check the
+articles: [Part 1](https://dev.to/hichamboushaba/consuming-activity-results-using-coroutines-part-1-2j57)
+and [Part 2](TODO)
+
 ### Download
 
 ```groovy
