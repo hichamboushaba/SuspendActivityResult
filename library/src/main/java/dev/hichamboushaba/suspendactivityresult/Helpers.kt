@@ -17,7 +17,7 @@ suspend fun ActivityResultManager.requestPermission(permission: String): Boolean
  * see [RequestMultiplePermissions]
  */
 suspend fun ActivityResultManager.requestPermissions(vararg permission: String): Map<String, Boolean>? {
-    return requestResult(RequestMultiplePermissions(), permission)
+    return requestResult(RequestMultiplePermissions(), arrayOf(*permission))
 }
 
 /**
