@@ -1,4 +1,4 @@
-package com.hicham.activityresult
+package com.hicham.activityresult.custom
 
 import android.app.Activity
 import android.content.Intent

@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.hicham.activityresult.databinding.FragmentMainBinding
 import com.hicham.activityresult.files.ExternalFilesFragment
-import com.hicham.activityresult.internal.InternalResultFragment
+import com.hicham.activityresult.custom.CustomResultFragment
 import com.hicham.activityresult.permission.regular.PermissionRegularFragment
 import com.hicham.activityresult.permission.suspend.PermissionSuspendFragment
 
@@ -34,7 +34,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
         binding.internalButton.setOnClickListener {
             parentFragmentManager.commit {
-                replace(R.id.fragment_container, InternalResultFragment())
+                replace(R.id.fragment_container, CustomResultFragment())
                 addToBackStack(null)
             }
         }

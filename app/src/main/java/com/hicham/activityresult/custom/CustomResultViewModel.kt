@@ -1,4 +1,4 @@
-package com.hicham.activityresult.internal
+package com.hicham.activityresult.custom
 
 import android.content.Context
 import android.content.Intent
@@ -6,7 +6,6 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.hicham.activityresult.BaseViewModel
-import com.hicham.activityresult.ResultActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.hichamboushaba.suspendactivityresult.ActivityResultManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class InternalResultViewModel @Inject constructor(
+class CustomResultViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val activityResultManager: ActivityResultManager
 ) : BaseViewModel() {
@@ -36,14 +35,14 @@ class InternalResultViewModel @Inject constructor(
     fun getResult() {
         viewModelScope.launch {
             savedStateHandle.set(IS_WAITING_FOR_RESULT, true)
-            val uri = activityResultManager.requestResult(
+            val result = activityResultManager.requestResult(
                 contract = CustomContract(),
                 input = null
             )
-            savedStateHandle.set(RESULT_KEY, uri)
+            savedStateHandle.set(RESULT_KEY, result)
             savedStateHandle.set(IS_WAITING_FOR_RESULT, false)
 
-            _result.value = uri
+            _result.value = result
         }
     }
 

@@ -1,4 +1,4 @@
-package com.hicham.activityresult.internal
+package com.hicham.activityresult.custom
 
 import android.os.Bundle
 import android.view.View
@@ -13,9 +13,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
-class InternalResultFragment :
-    BaseFragment<InternalResultViewModel>(R.layout.fragment_internal_result) {
-    override val viewModel: InternalResultViewModel by viewModels()
+class CustomResultFragment :
+    BaseFragment<CustomResultViewModel>(R.layout.fragment_internal_result) {
+    override val viewModel: CustomResultViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

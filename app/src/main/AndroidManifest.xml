@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ResultActivity"
+            android:name=".custom.ResultActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.GET_CONTENT" />
