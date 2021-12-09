@@ -45,8 +45,8 @@ afterEvaluate {
                     url = 'https://github.com/hichamboushaba/SuspendActivityResult'
                     licenses {
                         license {
-                            name = 'The Apache License, Version 2.0'
-                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            name = 'MIT License'
+                            url = 'http://www.opensource.org/licenses/mit-license.php'
                         }
                     }
                     developers {
@@ -59,7 +59,7 @@ afterEvaluate {
                     scm {
                         connection = 'scm:git:github.com/hichamboushaba/SuspendActivityResult.git'
                         developerConnection = 'scm:git:ssh://github.com/hichamboushaba/SuspendActivityResult.git'
-                        url = 'http://github.com/hichamboushaba/SuspendActivityResult'
+                        url = 'https://github.com/hichamboushaba/SuspendActivityResult'
                     }
                 }
             }

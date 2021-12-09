@@ -1,5 +1,9 @@
 ### Change Log
 
+Version 0.1.3
+-------------
+Update artifact's license to the MIT License
+
 Version 0.1.2
 -------------
 Remove unneeded dependencies from the library
