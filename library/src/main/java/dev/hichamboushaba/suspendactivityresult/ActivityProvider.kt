@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.flow.*
 import java.lang.ref.WeakReference
 
@@ -16,18 +17,26 @@ internal object ActivityProvider : Application.ActivityLifecycleCallbacks {
     private val _activityFlow = MutableStateFlow(WeakReference<ComponentActivity>(null))
     val activityFlow = _activityFlow.asStateFlow()
         .distinctUntilChanged { old, new -> old.get() === new.get() }
-        .filter { it.get() != null }
+        .filter {
+            val activity = it.get()
+            activity != null && activity.lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED)
+        }
         .map { it.get()!! }
 
     val currentActivity
         get() = _activityFlow.value.get()
+            ?.takeIf { it.lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED) }
 
     fun init(application: Application) {
         _applicationContext = application
         application.registerActivityLifecycleCallbacks(this)
     }
 
-    override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
+    override fun onActivityCreated(activity: Activity, bundle: Bundle?) {
+        (activity as? ComponentActivity)?.let {
+            _activityFlow.value = WeakReference(it)
+        }
+    }
 
     override fun onActivityStarted(activity: Activity) {
         (activity as? ComponentActivity)?.let {
