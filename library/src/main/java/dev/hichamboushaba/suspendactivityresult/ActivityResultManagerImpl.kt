@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.resume
 
 internal object ActivityResultManagerImpl : ActivityResultManager {
-    private const val SAVED_STATE_REGISTRY_KEY = "permissions_saved_state"
+    private const val SAVED_STATE_REGISTRY_KEY = "activityresult_saved_state"
     private const val PENDING_RESULT_KEY = "pending"
     private const val LAST_INCREMENT_KEY = "key_increment"
 
