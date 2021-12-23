@@ -52,7 +52,7 @@ below applies to it as well.
 ### Download
 
 ```groovy
-implementation 'dev.hichamboushaba.suspendactivityresult:suspendactivityresult:0.1.3'
+implementation 'dev.hichamboushaba.suspendactivityresult:suspendactivityresult:0.1.4'
 ```
 
 The default artifact uses [App Startup](https://developer.android.com/topic/libraries/app-startup)
@@ -61,7 +61,7 @@ for the initialization.
 If you don't want this dependency added, you can use the other variant:
 
 ```groovy
-implementation 'dev.hichamboushaba.suspendactivityresult:suspendactivityresult-no-startup:0.1.3'
+implementation 'dev.hichamboushaba.suspendactivityresult:suspendactivityresult-no-startup:0.1.4'
 ```
 
 And initialize the library manually
