@@ -1,11 +1,11 @@
 package dev.hichamboushaba.suspendactivityresult
 
+import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.os.bundleOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -48,7 +48,7 @@ internal object ActivityResultManagerImpl : ActivityResultManager {
                         }
 
                         if (!isLaunched) {
-                            launcher!!.launch(input)
+                            launcher?.launch(input)
                             isLaunched = true
                         }
                     }
@@ -62,10 +62,10 @@ internal object ActivityResultManagerImpl : ActivityResultManager {
     private fun <C : ActivityResultContract<*, *>> ComponentActivity.calculateKey(contract: C): Pair<Boolean, String> {
         fun generateKey(increment: Int) = "result_$increment"
 
-        val savedBundle = savedStateRegistry.consumeRestoredStateForKey(SAVED_STATE_REGISTRY_KEY)
+        val savedBundle: Bundle? = savedStateRegistry.consumeRestoredStateForKey(SAVED_STATE_REGISTRY_KEY)
 
-        return if (contract.javaClass.simpleName == savedBundle?.getString(PENDING_RESULT_KEY)) {
-            Pair(true, generateKey(savedBundle!!.getInt(LAST_INCREMENT_KEY)))
+        return if (contract.javaClass.simpleName == savedBundle?.getString(PENDING_RESULT_KEY) && savedBundle != null) {
+            Pair(true, generateKey(savedBundle.getInt(LAST_INCREMENT_KEY)))
         } else {
             Pair(false, generateKey(keyIncrement.getAndIncrement()))
         }

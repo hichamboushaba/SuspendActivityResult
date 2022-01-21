@@ -21,7 +21,7 @@ internal object ActivityProvider : Application.ActivityLifecycleCallbacks {
             val activity = it.get()
             activity != null && activity.lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED)
         }
-        .map { it.get()!! }
+        .map { it.get() }
 
     val currentActivity
         get() = _activityFlow.value.get()
@@ -56,5 +56,7 @@ internal object ActivityProvider : Application.ActivityLifecycleCallbacks {
 
     override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {}
 
-    override fun onActivityDestroyed(activity: Activity) {}
+    override fun onActivityDestroyed(activity: Activity) {
+        _activityFlow.value = WeakReference(null)
+    }
 }
