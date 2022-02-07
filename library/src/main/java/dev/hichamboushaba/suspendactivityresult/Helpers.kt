@@ -97,13 +97,13 @@ suspend fun ActivityResultManager.createDocument(fileName: String): Uri? {
 /**
  * see [StartIntentSenderForResult]
  */
-suspend fun ActivityResultManager.takeActivityResult(intentSenderRequest: IntentSenderRequest): ActivityResult? {
+suspend fun ActivityResultManager.startIntentSender(intentSenderRequest: IntentSenderRequest): ActivityResult? {
     return requestResult(StartIntentSenderForResult(), intentSenderRequest)
 }
 
 /**
  * see [StartActivityForResult]
  */
-suspend fun ActivityResultManager.takeStartActivityResult(intent: Intent): ActivityResult? {
+suspend fun ActivityResultManager.startActivityForResult(intent: Intent): ActivityResult? {
     return requestResult(StartActivityForResult(), intent)
 }

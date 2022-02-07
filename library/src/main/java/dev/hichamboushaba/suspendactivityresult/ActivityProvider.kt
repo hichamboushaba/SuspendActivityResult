@@ -15,17 +15,16 @@ internal object ActivityProvider : Application.ActivityLifecycleCallbacks {
         get() = _applicationContext
 
     private val _activityFlow = MutableStateFlow(WeakReference<ComponentActivity>(null))
-    val activityFlow = _activityFlow.asStateFlow()
-        .distinctUntilChanged { old, new -> old.get() === new.get() }
-        .filter {
-            val activity = it.get()
-            activity != null && activity.lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED)
-        }
-        .map { it.get() }
+    val activityFlow: Flow<ComponentActivity> =
+        _activityFlow
+            .asStateFlow()
+            .map { it.get() }
+            .filterNotNull()
+            .filter { it.lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED) }
 
-    val currentActivity
-        get() = _activityFlow.value.get()
-            ?.takeIf { it.lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED) }
+    val currentActivity: ComponentActivity?
+        get() = _activityFlow.value
+            .get()?.takeIf { it.lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED) }
 
     fun init(application: Application) {
         _applicationContext = application
@@ -56,7 +55,5 @@ internal object ActivityProvider : Application.ActivityLifecycleCallbacks {
 
     override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {}
 
-    override fun onActivityDestroyed(activity: Activity) {
-        _activityFlow.value = WeakReference(null)
-    }
+    override fun onActivityDestroyed(activity: Activity) {}
 }
