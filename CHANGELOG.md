@@ -1,5 +1,9 @@
 ### Change Log
 
+Version 0.1.5
+-------------
+Add extension functions for the contracts: StartIntentSenderForResult and StartActivityForResult
+
 Version 0.1.4
 -------------
 Fix a bug that resulted in a crash if an activity result was requested after process-death and
