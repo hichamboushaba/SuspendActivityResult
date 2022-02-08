@@ -39,8 +39,16 @@ suspend fun ActivityResultManager.takePicture(destination: Uri): Boolean {
 /**
  * see [TakeVideo]
  */
+@Deprecated("TakeVideo contract is deprecated", replaceWith = ReplaceWith("captureVideo"))
 suspend fun ActivityResultManager.takeVideo(destination: Uri): Bitmap? {
     return requestResult(TakeVideo(), destination)
+}
+
+/**
+ * see [TakeVideo]
+ */
+suspend fun ActivityResultManager.captureVideo(destination: Uri): Boolean? {
+    return requestResult(CaptureVideo(), destination)
 }
 
 /**
