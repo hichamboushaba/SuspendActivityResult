@@ -1,8 +1,10 @@
 package dev.hichamboushaba.suspendactivityresult
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.annotation.RequiresApi
 
@@ -90,4 +92,18 @@ suspend fun ActivityResultManager.openDocumentTree(startingLocation: Uri? = null
 @RequiresApi(19)
 suspend fun ActivityResultManager.createDocument(fileName: String): Uri? {
     return requestResult(CreateDocument(), fileName)
+}
+
+/**
+ * see [StartIntentSenderForResult]
+ */
+suspend fun ActivityResultManager.startIntentSender(intentSenderRequest: IntentSenderRequest): ActivityResult? {
+    return requestResult(StartIntentSenderForResult(), intentSenderRequest)
+}
+
+/**
+ * see [StartActivityForResult]
+ */
+suspend fun ActivityResultManager.startActivityForResult(intent: Intent): ActivityResult? {
+    return requestResult(StartActivityForResult(), intent)
 }
