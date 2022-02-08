@@ -18,6 +18,7 @@ internal object ActivityProvider : Application.ActivityLifecycleCallbacks {
     val activityFlow: Flow<ComponentActivity> =
         _activityFlow
             .asStateFlow()
+            .distinctUntilChanged { old, new -> old.get() === new.get() }
             .map { it.get() }
             .filterNotNull()
             .filter { it.lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED) }
