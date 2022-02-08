@@ -2,7 +2,8 @@
 
 Version 0.1.5
 -------------
-Add extension functions for the contracts: StartIntentSenderForResult and StartActivityForResult
+- Add extension functions for the contracts: StartIntentSenderForResult and StartActivityForResult
+- Deprecated takeVideo and add extension captureVideo that uses the contract CaptureVideo
 
 Version 0.1.4
 -------------
