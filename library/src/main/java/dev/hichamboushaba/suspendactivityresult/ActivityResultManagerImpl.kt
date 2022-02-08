@@ -48,7 +48,7 @@ internal object ActivityResultManagerImpl : ActivityResultManager {
                         }
 
                         if (!isLaunched) {
-                            launcher?.launch(input)
+                            launcher!!.launch(input)
                             isLaunched = true
                         }
                     }
